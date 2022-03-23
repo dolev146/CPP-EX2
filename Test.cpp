@@ -22,16 +22,13 @@ using namespace ariel;
 #include <algorithm>
 using namespace std;
 
-TEST_CASE("Good input")
+TEST_CASE("1")
 {
     Notebook note;
     note.write(0, 0, 0, Direction::Horizontal, "abc");
 
     CHECK((note.read(0, 0, 0, Direction::Horizontal, 3)) == ("abc"));
     /* Add more test here */
-
-    note.write(0, 1, 0, Direction::Horizontal, "abc");
-    /*18*/ CHECK((note.read(0, 1, 0, Direction::Horizontal, 3)) == ("abc"));
 }
 
 TEST_CASE("2")
@@ -95,33 +92,70 @@ TEST_CASE("10")
     CHECK((note.read(0, 0, 0, Direction::Horizontal, 4) == "~bcd"));
 }
 
-// TEST_CASE("Bad input")
-// {
-//     CHECK_THROWS(mat(10, 5, '$', '%'));
-//     /* Add more test here */
-// }
+TEST_CASE("11")
+{
+    Notebook note;
+    note.write(0, 0, 0, Direction::Vertical, "abcd");
+    note.erase(0, 0, 0, Direction::Horizontal, 1);
+    note.erase(0, 0, 0, Direction::Horizontal, 1);
+    CHECK((note.read(0, 0, 0, Direction::Horizontal, 4) == "~bcd"));
+}
 
-// TEST_CASE("21")
-// {
-//     /*1*/ CHECK_THROWS((mat(4, 4, '@', '-'))); // cant have EVEN mat
-// }
-// TEST_CASE("22")
-// {
-//     /*2*/ CHECK_THROWS((mat(2, 5, '@', '-'))); // cant have EVEN mat
-// }
-// TEST_CASE("23")
-// {
-//     /*3*/ CHECK_THROWS((mat(2, 40, '@', '-'))); // cant have EVEN mat
-// }
-// TEST_CASE("24")
-// {
-//     /*4*/ CHECK_THROWS((mat(0, 1, '@', '-'))); // 0 not valid input
-// }
-// TEST_CASE("25")
-// {
-//     /*5*/ CHECK_THROWS((mat(0, 0, '@', '-'))); // 0 not valid input
-// }
-// TEST_CASE("26")
-// {
-//     /*6*/ CHECK_THROWS((mat(-5, -7, '@', '-'))); // cant have negative numbers
-// }
+TEST_CASE("12")
+{
+    Notebook note;
+    note.write(0, 0, 0, Direction::Vertical, "abcd");
+    /*1*/ CHECK_THROWS(note.write(0, 0, 0, Direction::Vertical, "abcd"));
+}
+
+TEST_CASE("13")
+{
+    Notebook note;
+    note.write(0, 0, 0, Direction::Vertical, "a");
+    note.write(1, 0, 0, Direction::Vertical, "b");
+    note.write(2, 0, 0, Direction::Vertical, "c");
+    note.write(3, 0, 0, Direction::Vertical, "d");
+    CHECK((note.read(0, 0, 0, Direction::Horizontal, 4) == "abcd"));
+}
+TEST_CASE("14")
+{
+    Notebook note;
+    note.write(0, 0, 0, Direction::Horizontal, "abcd");
+    CHECK_THROWS(note.write(0, 0, 0, Direction::Vertical, "abcd"));
+}
+TEST_CASE("15")
+{
+    Notebook note;
+    note.write(0, 0, 0, Direction::Horizontal, "abcd");
+    CHECK_THROWS(note.write(0, 0, 0, Direction::Vertical, "abcd"));
+}
+TEST_CASE("16")
+{
+    // you cannot write where you delete
+    Notebook note;
+    note.write(100, 100, 50, Direction::Horizontal, "dolev");
+    note.erase(100, 100, 50, Direction::Horizontal, 4);
+    CHECK_THROWS(note.write(100, 100, 50, Direction::Horizontal, "dolev"));
+}
+
+TEST_CASE("17")
+{
+    Notebook note;
+    CHECK_THROWS(note.write(-1, 0, 0, Direction::Vertical, "Dolev"));
+}
+TEST_CASE("18")
+{
+    Notebook note;
+    CHECK_THROWS(note.write(0, -1, 0, Direction::Vertical, "Dolev"));
+}
+TEST_CASE("19")
+{
+    Notebook note;
+    CHECK_THROWS(note.write(0, 0, -1, Direction::Vertical, "Dolev"));
+}
+
+TEST_CASE("20")
+{
+    Notebook note;
+    CHECK_THROWS(note.read(5, 5, 5, Direction::Vertical, -4));
+}
