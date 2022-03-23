@@ -159,3 +159,11 @@ TEST_CASE("20")
     Notebook note;
     CHECK_THROWS(note.read(5, 5, 5, Direction::Vertical, -4));
 }
+
+
+TEST_CASE("21")
+{
+    Notebook note;
+
+    CHECK_THROWS( note.write(0, 0, 99, Direction::Vertical, "abc"););
+}
