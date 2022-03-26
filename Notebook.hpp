@@ -6,18 +6,26 @@
 #include <string>
 #include <stdexcept>
 #include "Direction.hpp"
+#include <map>
+#include <string>
+#include <list>
+#include <vector>
+#include <exception>
 
-using namespace std;
-using namespace ariel;
 
 namespace ariel
 {
     class Notebook
     {
 
+        // map<int, vector<vector<char>> pages(10, vector<char>(n, '_'))>;
+
     public:
-        void write(int page, int row, int col, Direction dir, string const & txt);
-        string read(int page, int row, int col, Direction dir, int length);
+        std::map<int, std::vector<std::vector<char>>> my_notebook;
+        
+
+        void write(int page, int row, int col, Direction dir, std::string const &txt);
+        std::string read(int page, int row, int col, Direction dir, int length);
         void erase(int page, int row, int col, Direction dir, int length);
         void show(int page);
     };

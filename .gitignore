@@ -1,6 +1,10 @@
 # Solution
 solution*
 
+.vscode
+.idea
+
+
 # Prerequisites
 *.d
 
