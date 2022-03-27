@@ -44,13 +44,11 @@ namespace ariel
         unsigned int size_of_str = txt.size();
         unsigned int u_row = unsigned(row);
         unsigned int vertical_size = (dir == Direction::Vertical) ? size_of_str : NOT_VERTICAL;
-        cout << "matrix.size() < (u_row - SAFTEY_ADD)" << matrix.size() << " < " << (u_row - SAFTEY_ADD) << endl;
-        while (matrix.size() < (u_row + SAFTEY_ADD))
+        while (matrix.size() < (u_row + SAFTEY_ADD + vertical_size))
         {
             matrix.resize(matrix.size() * SAFTEY_MUL);
         }
         unsigned int resize_amount = matrix.size() - resize_counter;
-        std::cout << "resize_amount : " << resize_amount << endl;
         for (size_t i = initial_mat_size - 1; i < initial_mat_size + resize_amount; i++)
         {
             matrix[i].resize(COL_AMOUNT, '_');
@@ -64,13 +62,11 @@ namespace ariel
         unsigned int size_of_str = length;
         unsigned int u_row = unsigned(row);
         unsigned int vertical_size = (dir == Direction::Vertical) ? size_of_str : NOT_VERTICAL;
-        cout << "matrix.size() < (u_row - SAFTEY_ADD)" << matrix.size() << " < " << (u_row - SAFTEY_ADD) << endl;
-        while (matrix.size() < (u_row + SAFTEY_ADD))
+        while (matrix.size() < (u_row + SAFTEY_ADD + vertical_size))
         {
             matrix.resize(matrix.size() * SAFTEY_MUL);
         }
         unsigned int resize_amount = matrix.size() - resize_counter;
-        std::cout << "resize_amount : " << resize_amount << endl;
         for (size_t i = initial_mat_size - 1; i < initial_mat_size + resize_amount; i++)
         {
             matrix[i].resize(COL_AMOUNT, '_');
@@ -139,7 +135,7 @@ namespace ariel
             }
             else if (dir == Direction::Vertical)
             {
-                horizontal_direction_write_found(txt, matrix, u_column, u_row);
+                vertical_direction_write_found(txt, matrix, u_column, u_row);
             }
             it->second = matrix;
         }
@@ -176,10 +172,13 @@ namespace ariel
             matrix = it->second;
             increase_page_size_read(matrix, ulength, dir, u_row);
             if (dir == Direction::Horizontal)
+            {
                 for (unsigned int i = u_column; i < u_column + ulength; i++)
                 {
                     output += matrix[u_row][i];
                 }
+            }
+
             else
             {
                 for (unsigned int i = u_row; i < u_row + ulength; i++)
@@ -194,10 +193,12 @@ namespace ariel
             vector<vector<char>> matrix(u_row, vector<char>(COL_AMOUNT, '_'));
             increase_page_size_read(matrix, ulength, dir, u_row);
             if (dir == Direction::Horizontal)
+            {
                 for (unsigned int i = u_column; i < u_column + ulength; i++)
                 {
                     output += matrix[u_row][i];
                 }
+            }
             else
             {
                 for (unsigned int i = u_row; i < u_row + ulength; i++)
