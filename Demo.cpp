@@ -17,9 +17,9 @@ using namespace std;
 int main()
 {
 	ariel::Notebook notebook;
-	notebook.write(/*page=*/100, /*row=*/100, /*column=*/50, Direction::Horizontal, "abcd");
-	notebook.write(/*page=*/100, /*row=*/100, /*column=*/54, Direction::Horizontal, "abcd");
-	notebook.write(/*page=*/100, /*row=*/101, /*column=*/54, Direction::Horizontal, "abcd");
+	notebook.write(/*page=*/100, /*row=*/100, /*column=*/50, Direction::Vertical, "abcd");
+	notebook.write(/*page=*/100, /*row=*/100, /*column=*/54, Direction::Vertical, "abcd");
+	notebook.write(/*page=*/100, /*row=*/101, /*column=*/54, Direction::Vertical, "abcd");
 	// cout << notebook.read(/*page=*/100, /*row=*/100, /*column=*/50, Direction::Horizontal, /*length=*/4) << endl;
 	// prints "_b_" (starts at row 99 which is empty; then at row 100 there is "b"; then row 101 is empty again).
 	// notebook.write(/*page=*/100, /*row=*/70, /*column=*/52, Direction::Vertical, "xyz");

@@ -72,6 +72,77 @@ namespace ariel
         }
     }
 
+    void add_row_horizontal(std::map<int, std::map<int, std::string>>::iterator it, std::map<int, std::string> pageOfbook, int row, int column, std::string const &txt)
+    {
+        std::map<int, std::string>::iterator it2 = pageOfbook.find(row);
+        if (it2 != pageOfbook.end())
+        {
+            // row found
+            std::string row_of_page = it2->second;
+            size_t u_column = (size_t)column;
+            size_t size_of_txt = txt.size();
+            size_t counter = 0;
+            for (size_t i = u_column; i < u_column + size_of_txt; i++)
+            {
+                if (row_of_page[i] != '_')
+                {
+                    throw std::invalid_argument("index already taken ");
+                }
+                row_of_page[i] = txt[counter];
+                counter++;
+            }
+            it2->second = row_of_page;
+            it->second = pageOfbook;
+        }
+        else
+        {
+            // row not found need to create
+            std::string row_of_page = std::string(COL_AMOUNT, '_');
+            size_t counter = 0;
+            size_t size_of_txt = txt.size();
+            size_t u_column = (size_t)column;
+            for (size_t i = u_column; i < u_column + size_of_txt; i++)
+            {
+                row_of_page[i] = txt[counter];
+                counter++;
+            }
+            pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
+            it->second = pageOfbook;
+        }
+    }
+
+    void create_row_horizontal(std::string const &txt, int row, int column, int page, std::map<int, std::map<int, std::string>> &notebook)
+    {
+        size_t size_of_txt = txt.size();
+        std::map<int, std::string> pageOfbook;
+        std::string row_of_page = std::string(COL_AMOUNT, '_');
+        size_t counter = 0;
+        size_t u_column = (size_t)column;
+        for (size_t i = u_column; i < u_column + size_of_txt; i++)
+        {
+            row_of_page[i] = txt[counter];
+            counter++;
+        }
+        pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
+        notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+    }
+
+    void create_row_vertical(std::string const &txt, int row, int column, std::map<int, std::map<int, std::string>> &notebook , int page)
+    {
+        size_t size_of_txt = txt.size();
+        std::map<int, std::string> pageOfbook;
+        size_t counter = 0;
+        size_t u_column = (size_t)column;
+        for (int i = 0; i < size_of_txt; i++)
+        {
+            std::string row_of_page = std::string(COL_AMOUNT, '_');
+            row_of_page[u_column] = txt[counter];
+            pageOfbook.insert(std::pair<int, std::string>(row + i, row_of_page));
+            counter++;
+        }
+        notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+    }
+
     void Notebook::write(int page, int row, int column, Direction dir, std::string const &txt)
     {
         check_printable_chars(txt);
@@ -87,48 +158,11 @@ namespace ariel
                 std::map<int, std::string> pageOfbook = it->second;
                 // if row exists we will use it ,
                 // else we need to make a row
-                std::map<int, std::string>::iterator it2 = pageOfbook.find(row);
-                if (it2 != pageOfbook.end())
-                {
-                    // row found
-                    std::string row_of_page = it2->second;
-                    size_t u_column = (size_t)column;
-                    size_t size_of_txt = txt.size();
-                    size_t counter = 0;
-                    for (size_t i = u_column; i < u_column + size_of_txt; i++)
-                    {
-                        if (row_of_page[i] != '_')
-                        {
-                            throw std::invalid_argument("index already taken ");
-                        }
-                        row_of_page[i] = txt[counter];
-                        counter++;
-                    }
-                    it2->second = row_of_page;
-                    it->second = pageOfbook;
-                }
-                else
-                {
-                    // row not found need to create
-
-                    std::string row_of_page = std::string(COL_AMOUNT, '_');
-                    size_t counter = 0;
-                    size_t size_of_txt = txt.size();
-                    size_t u_column = (size_t)column;
-                    for (size_t i = u_column; i < u_column + size_of_txt; i++)
-                    {
-                        row_of_page[i] = txt[counter];
-                        counter++;
-                    }
-                    pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
-                    it->second = pageOfbook;
-                }
+                add_row_horizontal(it, pageOfbook, row, column, txt);
             }
             else
             {
                 // vertical
-                
-
             }
         }
         else
@@ -137,34 +171,12 @@ namespace ariel
             if (dir == Direction::Horizontal)
             {
                 // horizontal
-                size_t size_of_txt = txt.size();
-                std::map<int, std::string> pageOfbook;
-                std::string row_of_page = std::string(COL_AMOUNT, '_');
-                size_t counter = 0;
-                size_t u_column = (size_t)column;
-                for (size_t i = u_column; i < u_column + size_of_txt; i++)
-                {
-                    row_of_page[i] = txt[counter];
-                    counter++;
-                }
-                pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
-                notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+                create_row_horizontal(txt, row, column, page, notebook);
             }
             else
             {
                 // vertical
-                size_t size_of_txt = txt.size();
-                std::map<int, std::string> pageOfbook;
-                size_t counter = 0;
-                size_t u_column = (size_t)column;
-                for (int i = 0; i < size_of_txt; i++)
-                {
-                    std::string row_of_page = std::string(COL_AMOUNT, '_');
-                    row_of_page[u_column] = txt[counter];
-                    pageOfbook.insert(std::pair<int, std::string>(row + i, row_of_page));
-                    counter++;
-                }
-                notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+                create_row_vertical(txt, row, column, notebook , page);
             }
         }
     }
