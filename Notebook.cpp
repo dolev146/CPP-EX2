@@ -6,7 +6,7 @@ constexpr int SAFTEY_ADD = 5;
 constexpr int NOT_VERTICAL = 0;
 constexpr int DEFAULT_PAGE_SIZE = 0;
 
-// hours wasted: 72
+// hours wasted: 72 my life i want to die please fast
 // used searches
 // https://stackoverflow.com/questions/3136520/determine-if-map-contains-a-value-for-a-key
 // https://stackoverflow.com/questions/65877299/wsign-conversion-error-when-getting-index-for-vector
@@ -15,306 +15,179 @@ constexpr int DEFAULT_PAGE_SIZE = 0;
 // https://stackoverflow.com/questions/4527686/how-to-update-stdmap-after-using-the-find-method
 // https://stackoverflow.com/questions/44467268/how-to-extend-vector-size-by-one-element-and-fill-it-with-variable
 // https://stackoverflow.com/questions/15889578/how-can-i-resize-a-2d-vector-of-objects-given-the-width-and-height
+// old project that failed https://github.com/dolev146/CPP-EX2 but it doesnt work on large numbers
 
-using namespace std;
 namespace ariel
 {
-
-    void first_check(int page = 0, int row = 0, int column = 0)
+    void check_page_not_negative(int page)
     {
-        if (page < 0 || row < 0 || column < 0)
+        if (page < 0)
         {
-            throw std::invalid_argument("negative input ");
+            throw std::runtime_error("no negative page !");
         }
     }
-    void second_check(string const &txt, int column)
+
+    void check_printable_chars(std::string const &txt)
     {
-        unsigned int size_of_str1 = txt.size();
+        for (size_t i = 0; i < txt.size(); i++)
+        {
+            char c = txt.at(i);
+            if (c < ' ' || c >= '~')
+            {
+                throw std::runtime_error("error cannot write \\n ");
+            }
+        }
+
+        if (txt == "\n")
+        {
+            throw std::runtime_error("error cannot write \\n ");
+        }
+    }
+
+    void bound_column_check(std::string const &txt, int column)
+    {
+        unsigned int size_of_str = txt.size();
         unsigned int u_column = unsigned(column);
-        if (column > COL_LIMIT || size_of_str1 + u_column > COL_LIMIT)
+        if (column > COL_LIMIT || size_of_str + u_column > COL_LIMIT)
         {
             throw std::invalid_argument("column can't be greater that 99 , bad index");
         }
     }
 
-    void increase_page_size(vector<vector<char>> &matrix, string const &txt, Direction dir, unsigned int row)
+    void bound_column_check(int length, int column)
     {
-        unsigned int initial_mat_size = matrix.size();
-        unsigned int resize_counter = matrix.size();
-        unsigned int size_of_str = txt.size();
-        unsigned int u_row = unsigned(row);
-        unsigned int vertical_size = (dir == Direction::Vertical) ? size_of_str : NOT_VERTICAL;
-        while (matrix.size() < (u_row + SAFTEY_ADD + vertical_size))
-        {
-            matrix.resize(matrix.size() * SAFTEY_MUL);
-        }
-        unsigned int resize_amount = matrix.size() - resize_counter;
-        for (size_t i = initial_mat_size - 1; i < initial_mat_size + resize_amount; i++)
-        {
-            matrix[i].resize(COL_AMOUNT, '_');
-        }
-    }
-
-    void increase_page_size_read(vector<vector<char>> &matrix, unsigned int length, Direction dir, unsigned int row)
-    {
-        unsigned int initial_mat_size = matrix.size();
-        unsigned int resize_counter = matrix.size();
-        unsigned int size_of_str = length;
-        unsigned int u_row = unsigned(row);
-        unsigned int vertical_size = (dir == Direction::Vertical) ? size_of_str : NOT_VERTICAL;
-        while (matrix.size() < (u_row + SAFTEY_ADD + vertical_size))
-        {
-            matrix.resize(matrix.size() * SAFTEY_MUL);
-        }
-        unsigned int resize_amount = matrix.size() - resize_counter;
-        for (size_t i = initial_mat_size - 1; i < initial_mat_size + resize_amount; i++)
-        {
-            matrix[i].resize(COL_AMOUNT, '_');
-        }
-    }
-
-    void horizontal_direction_write_found(string const &txt, vector<vector<char>> &matrix, unsigned int u_column, unsigned int u_row)
-    {
-        unsigned int size_of_str = txt.size();
-        unsigned int counter = 0;
-
-        for (unsigned int i = u_column; i < size_of_str + u_column; i++)
-        {
-            if (matrix.at(u_row).at(i) != '_')
-            {
-                throw std::invalid_argument("index already taken ");
-            }
-            matrix.at(u_row).at(i) = txt[counter];
-            counter++;
-        }
-    }
-
-    void vertical_direction_write_found(string const &txt, vector<vector<char>> &matrix, unsigned int u_column, unsigned int u_row)
-    {
-        unsigned int size_of_str = txt.size();
-        unsigned int counter = 0;
-        for (unsigned int i = u_row; i < size_of_str + u_row; i++)
-        {
-            if (matrix[i][u_column] != '_')
-            {
-                throw std::invalid_argument("index already taken ");
-            }
-            matrix[i][u_column] = txt[counter];
-            counter++;
-        }
-    }
-
-    /*
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     */
-
-    void Notebook::write(int page, int row, int column, Direction dir, string const &txt)
-    {
-        first_check(page, row, column);
-        second_check(txt, column);
-        unsigned int u_column = unsigned(column);
-        unsigned int u_row = unsigned(row);
-        map<int, vector<vector<char>>>::iterator it = my_notebook.find(page);
-        if (it != my_notebook.end())
-        {
-            // found
-            vector<vector<char>> matrix;
-            matrix = it->second;
-            increase_page_size(matrix, txt, dir, u_row);
-            if (dir == Direction::Horizontal)
-            {
-                horizontal_direction_write_found(txt, matrix, u_column, u_row);
-            }
-            else if (dir == Direction::Vertical)
-            {
-                vertical_direction_write_found(txt, matrix, u_column, u_row);
-            }
-            it->second = matrix;
-        }
-        else
-        {
-            // not found
-            vector<vector<char>> matrix(u_row, vector<char>(COL_AMOUNT, '_'));
-            increase_page_size(matrix, txt, dir, u_row);
-
-            if (dir == Direction::Horizontal)
-            {
-                horizontal_direction_write_found(txt, matrix, u_column, u_row);
-            }
-            else if (dir == Direction::Vertical)
-            {
-                vertical_direction_write_found(txt, matrix, u_column, u_row);
-            }
-            my_notebook.insert(std::pair<int, vector<vector<char>>>(page, matrix));
-        }
-    }
-
-    string Notebook::read(int page, int row, int column, Direction dir, int length)
-    {
-        first_check(page, row, column);
-        unsigned int u_row = unsigned(row);
-        unsigned int u_column = unsigned(column);
-        unsigned int ulength = unsigned(length);
-        std::string output;
-        map<int, vector<vector<char>>>::iterator it = my_notebook.find(page);
-        if (it != my_notebook.end())
-        {
-            // found
-            vector<vector<char>> matrix;
-            matrix = it->second;
-            increase_page_size_read(matrix, ulength, dir, u_row);
-            if (dir == Direction::Horizontal)
-            {
-                for (unsigned int i = u_column; i < u_column + ulength; i++)
-                {
-                    output += matrix[u_row][i];
-                }
-            }
-
-            else
-            {
-                for (unsigned int i = u_row; i < u_row + ulength; i++)
-                {
-                    output += matrix[i][u_column];
-                }
-            }
-        }
-        else
-        {
-            // not found
-            vector<vector<char>> matrix(u_row, vector<char>(COL_AMOUNT, '_'));
-            increase_page_size_read(matrix, ulength, dir, u_row);
-            if (dir == Direction::Horizontal)
-            {
-                for (unsigned int i = u_column; i < u_column + ulength; i++)
-                {
-                    output += matrix[u_row][i];
-                }
-            }
-            else
-            {
-                for (unsigned int i = u_row; i < u_row + ulength; i++)
-                {
-                    output += matrix[i][u_column];
-                }
-            }
-        }
-        return output;
-    }
-
-    void Notebook::erase(int page, int row, int column, Direction dir, int length)
-    {
-        first_check(page, row, column);
         unsigned int u_length = unsigned(length);
         unsigned int u_column = unsigned(column);
-        unsigned int u_row = unsigned(row);
-        map<int, vector<vector<char>>>::iterator it = my_notebook.find(page);
-
-        if (it != my_notebook.end())
+        if (column > COL_LIMIT || u_length + u_column > COL_LIMIT)
         {
-            // found
-            vector<vector<char>> matrix;
-            matrix = it->second;
-            increase_page_size_read(matrix, u_length, dir, u_row);
-
-            if (dir == Direction::Horizontal)
-            {
-                unsigned int size_of_str = u_length;
-                unsigned int counter = 0;
-                for (unsigned int i = u_column; i < size_of_str + u_column; i++)
-                {
-                    matrix[u_row][i] = '~';
-                    counter++;
-                }
-            }
-            else if (dir == Direction::Vertical)
-            {
-                unsigned int size_of_str = u_length;
-                unsigned int counter = 0;
-                for (unsigned int i = u_row; i < size_of_str + u_row; i++)
-                {
-                    matrix[i][u_column] = '~';
-                    counter++;
-                }
-                it->second = matrix;
-            }
-        }
-        else
-        {
-            // not found
-            vector<vector<char>> matrix(u_row, vector<char>(COL_AMOUNT, '_'));
-            increase_page_size_read(matrix, u_length, dir, u_row);
-            if (dir == Direction::Horizontal)
-            {
-                unsigned int size_of_str = u_length;
-                unsigned int counter = 0;
-                for (unsigned int i = u_column; i < size_of_str + u_column; i++)
-                {
-                    if (matrix[u_row][i] != '_')
-                    {
-                        throw std::invalid_argument("index already taken ");
-                    }
-                    matrix[u_row][i] = '~';
-                    counter++;
-                }
-            }
-            else if (dir == Direction::Vertical)
-            {
-                unsigned int size_of_str = u_length;
-                unsigned int counter = 0;
-                for (unsigned int i = u_row; i < size_of_str + u_row; i++)
-                {
-                    if (matrix[i][u_column] != '_')
-                    {
-                        throw std::invalid_argument("index already taken ");
-                    }
-                    matrix[i][u_column] = '~';
-                    counter++;
-                }
-            }
-            my_notebook.insert(std::pair<int, vector<vector<char>>>(page, matrix));
+            throw std::invalid_argument("column can't be greater that 99 , bad index");
         }
     }
-    void Notebook::show(int page)
+
+    void check_negative_values_write(int page, int row, int column)
     {
-        std::string output;
-        map<int, vector<vector<char>>>::iterator it = my_notebook.find(page);
-        if (it != my_notebook.end())
+        if (page < 0 || row < 0 || column < 0)
         {
-            // found
-            vector<vector<char>> matrix;
-            matrix = it->second;
-            for (unsigned int i = 0; i < matrix.size(); ++i)
+            throw std::runtime_error("negative value");
+        }
+    }
+
+    void Notebook::write(int page, int row, int column, Direction dir, std::string const &txt)
+    {
+        check_printable_chars(txt);
+        check_negative_values_write(page, row, column);
+        bound_column_check(txt, column);
+        std::map<int, std::map<int, std::string>>::iterator it = notebook.find(page);
+        if (it != notebook.end())
+        {
+            // page found
+            if (dir == Direction::Horizontal)
             {
-                for (unsigned int j = 0; j < matrix[i].size(); ++j)
+                // horizontal
+                std::map<int, std::string> pageOfbook = it->second;
+                // if row exists we will use it ,
+                // else we need to make a row
+                std::map<int, std::string>::iterator it2 = pageOfbook.find(row);
+                if (it2 != pageOfbook.end())
                 {
-                    output += matrix[i][j];
+                    // row found
+                    std::string row_of_page = it2->second;
+                    size_t u_column = (size_t)column;
+                    size_t size_of_txt = txt.size();
+                    size_t counter = 0;
+                    for (size_t i = u_column; i < u_column + size_of_txt; i++)
+                    {
+                        if (row_of_page[i] != '_')
+                        {
+                            throw std::invalid_argument("index already taken ");
+                        }
+                        row_of_page[i] = txt[counter];
+                        counter++;
+                    }
+                    it2->second = row_of_page;
+                    it->second = pageOfbook;
                 }
-                output += '\n';
+                else
+                {
+                    // row not found need to create
+
+                    std::string row_of_page = std::string(COL_AMOUNT, '_');
+                    size_t counter = 0;
+                    size_t size_of_txt = txt.size();
+                    size_t u_column = (size_t)column;
+                    for (size_t i = u_column; i < u_column + size_of_txt; i++)
+                    {
+                        row_of_page[i] = txt[counter];
+                        counter++;
+                    }
+                    pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
+                    it->second = pageOfbook;
+                }
             }
-            cout << output << endl;
+            else
+            {
+                // vertical
+                
+
+            }
         }
         else
         {
-            vector<vector<char>> matrix(DEFAULT_PAGE_SIZE, vector<char>(COL_AMOUNT, '_'));
-            for (unsigned int i = 0; i < matrix.size(); ++i)
+            // page not found
+            if (dir == Direction::Horizontal)
             {
-                for (unsigned int j = 0; j < matrix[i].size(); ++j)
+                // horizontal
+                size_t size_of_txt = txt.size();
+                std::map<int, std::string> pageOfbook;
+                std::string row_of_page = std::string(COL_AMOUNT, '_');
+                size_t counter = 0;
+                size_t u_column = (size_t)column;
+                for (size_t i = u_column; i < u_column + size_of_txt; i++)
                 {
-                    output += matrix[i][j];
+                    row_of_page[i] = txt[counter];
+                    counter++;
                 }
-                output += '\n';
+                pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
+                notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
             }
-            cout << output << endl;
-            my_notebook.insert(std::pair<int, vector<vector<char>>>(page, matrix));
+            else
+            {
+                // vertical
+                size_t size_of_txt = txt.size();
+                std::map<int, std::string> pageOfbook;
+                size_t counter = 0;
+                size_t u_column = (size_t)column;
+                for (int i = 0; i < size_of_txt; i++)
+                {
+                    std::string row_of_page = std::string(COL_AMOUNT, '_');
+                    row_of_page[u_column] = txt[counter];
+                    pageOfbook.insert(std::pair<int, std::string>(row + i, row_of_page));
+                    counter++;
+                }
+                notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+            }
+        }
+    }
+
+    // std::string read(int page, int row, int column, Direction dir, int length)
+    // {
+    //     check_negative_values_write(page, row, column);
+    //     bound_column_check(length, column);
+    // }
+
+    void Notebook::show(int page)
+    {
+        check_page_not_negative(page);
+        if (notebook.find(page) == notebook.end())
+        {
+            std::cout << "the page " << page << "is empty " << std::endl;
+            return;
+        }
+
+        std::map<int, std::string> rows = notebook.at(page);
+        for (auto const &row : rows)
+        {
+            std::cout << row.second << std::endl;
         }
     }
 
