@@ -4,6 +4,7 @@ constexpr int COL_AMOUNT = 100;
 constexpr int SAFTEY_MUL = 3;
 constexpr int SAFTEY_ADD = 5;
 constexpr int NOT_VERTICAL = 0;
+constexpr int ADD = 1;
 constexpr int DEFAULT_PAGE_SIZE = 0;
 constexpr size_t DEFAULT_CHAR_INDEX = 0;
 
@@ -20,6 +21,9 @@ constexpr size_t DEFAULT_CHAR_INDEX = 0;
 
 namespace ariel
 {
+
+    void negative_values_new_check(int const &page, int const &row, int const &column, int const &length, Direction dir);
+
     void check_page_not_negative(int page)
     {
         if (page < 0)
@@ -49,9 +53,9 @@ namespace ariel
     {
         unsigned int size_of_str = txt.size();
         unsigned int u_column = unsigned(column);
-        if (column > COL_LIMIT || size_of_str + u_column > COL_LIMIT)
+        if (column > COL_LIMIT + ADD || size_of_str + u_column > COL_LIMIT + ADD)
         {
-            throw std::invalid_argument("column can'string_to_delete be greater that 99 , bad index");
+            throw std::invalid_argument("column can't be greater that 99 , bad index");
         }
     }
 
@@ -59,9 +63,9 @@ namespace ariel
     {
         unsigned int u_length = unsigned(length);
         unsigned int u_column = unsigned(column);
-        if (column > COL_LIMIT || u_length + u_column > COL_LIMIT)
+        if (column > COL_LIMIT + ADD || u_length + u_column > COL_LIMIT + ADD)
         {
-            throw std::invalid_argument("column can'string_to_delete be greater that 99 , bad index");
+            throw std::invalid_argument("column can't be greater that 99 , bad index");
         }
     }
 
@@ -280,9 +284,7 @@ namespace ariel
             else
             {
                 // vertical
-                // add_row_vertical();
                 std::map<int, std::string> pageOfbook = it->second;
-
                 size_t length = txt.size();
                 for (size_t i = 0; i < length; i++)
                 {
@@ -322,8 +324,12 @@ namespace ariel
 
     std::string Notebook::read(int page, int row, int column, Direction dir, int length)
     {
-        check_negative_values_write(page, row, column);
-        bound_column_check(length, column);
+        negative_values_new_check(page, row, column, length, dir);
+        if (dir == Direction::Horizontal)
+        {
+            bound_column_check(length, column);
+        }
+
         std::string output;
         std::map<int, std::map<int, std::string>>::iterator it = notebook.find(page);
         if (it != notebook.end())
@@ -362,8 +368,15 @@ namespace ariel
     {
 
         check_negative_values_write(page, row, column);
-        bound_column_check(length, column);
-        
+        if (length < 0)
+        {
+            throw std::runtime_error("nagetive values");
+        }
+        if (dir == Direction::Horizontal)
+        {
+            bound_column_check(length, column);
+        }
+
         std::string string_to_delete;
         if (notebook.find(page) == notebook.end())
         {
@@ -404,7 +417,7 @@ namespace ariel
         check_page_not_negative(page);
         if (notebook.find(page) == notebook.end())
         {
-            std::cout << "the page " << page << "is empty " << std::endl;
+            std::cout << "empty page number " << page <<  std::endl;
             return;
         }
 
@@ -412,6 +425,14 @@ namespace ariel
         for (auto const &row : rows)
         {
             std::cout << row.second << std::endl;
+        }
+    }
+
+    void negative_values_new_check(int const &page, int const &row, int const &column, int const &length, Direction dir)
+    {
+        if (page < 0 || row < 0 || column < 0 || length < 0 || column >= COL_AMOUNT)
+        {
+            throw std::runtime_error("nagetive values");
         }
     }
 }
