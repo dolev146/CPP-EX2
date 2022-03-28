@@ -360,6 +360,10 @@ namespace ariel
 
     void Notebook::erase(int page, int row, int column, Direction dir, int length)
     {
+
+        check_negative_values_write(page, row, column);
+        bound_column_check(length, column);
+        
         std::string string_to_delete;
         if (notebook.find(page) == notebook.end())
         {
