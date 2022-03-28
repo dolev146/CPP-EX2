@@ -51,7 +51,7 @@ namespace ariel
         unsigned int u_column = unsigned(column);
         if (column > COL_LIMIT || size_of_str + u_column > COL_LIMIT)
         {
-            throw std::invalid_argument("column can't be greater that 99 , bad index");
+            throw std::invalid_argument("column can'string_to_delete be greater that 99 , bad index");
         }
     }
 
@@ -61,7 +61,7 @@ namespace ariel
         unsigned int u_column = unsigned(column);
         if (column > COL_LIMIT || u_length + u_column > COL_LIMIT)
         {
-            throw std::invalid_argument("column can't be greater that 99 , bad index");
+            throw std::invalid_argument("column can'string_to_delete be greater that 99 , bad index");
         }
     }
 
@@ -358,6 +358,43 @@ namespace ariel
         return output;
     }
 
+    void Notebook::erase(int page, int row, int column, Direction dir, int length)
+    {
+        std::string string_to_delete;
+        if (notebook.find(page) == notebook.end())
+        {
+            std::map<int, std::string> pageOfbook;
+            string_to_delete = std::string(COL_AMOUNT, '_');
+            pageOfbook.insert(std::pair<int, std::string>(row, string_to_delete));
+            notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+        }
+        else
+        {
+            if (notebook.at(page).find(row) == notebook.at(page).end())
+            {
+                string_to_delete = std::string(COL_AMOUNT, '_');
+                notebook.at(page).insert(std::pair<int, std::string>(row, string_to_delete));
+            }
+        }
+        string_to_delete = notebook.at(page).at(row);
+
+        if (dir == Direction::Horizontal)
+        {
+            for (unsigned int i = ((unsigned int)column); i < column + ((int)length); i++)
+            {
+                string_to_delete.at(i) = '~';
+            }
+            notebook.at(page).at(row) = string_to_delete;
+        }
+        if (dir == Direction::Vertical)
+        {
+            for (int i = 0; i < (int)length; i++)
+            {
+                erase(page, ((int)row + i), column, Direction::Horizontal, 1);
+            }
+        }
+    }
+
     void Notebook::show(int page)
     {
         check_page_not_negative(page);
@@ -373,5 +410,4 @@ namespace ariel
             std::cout << row.second << std::endl;
         }
     }
-
 }
