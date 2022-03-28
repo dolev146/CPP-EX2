@@ -13,7 +13,7 @@ namespace ariel
     {
 
     public:
-                std::map<int, std::map<int, std::string>> notebook;
+        std::map<int, std::map<int, std::string>> notebook;
         void write(int page, int row, int column, Direction dir, std::string const &txt);
         std::string read(int page, int row, int column, Direction dir, int length);
         void erase(int page, int row, int column, Direction dir, int length);

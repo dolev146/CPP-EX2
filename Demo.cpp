@@ -17,10 +17,10 @@ using namespace std;
 int main()
 {
 	ariel::Notebook notebook;
-	notebook.write(/*page=*/100, /*row=*/100, /*column=*/50, Direction::Vertical, "abcd");
-	notebook.write(/*page=*/100, /*row=*/100, /*column=*/54, Direction::Vertical, "xyzw");
-	notebook.write(/*page=*/100, /*row=*/104, /*column=*/54, Direction::Vertical, "fuck");
-	// cout << notebook.read(/*page=*/100, /*row=*/100, /*column=*/50, Direction::Horizontal, /*length=*/4) << endl;
+	notebook.write(/*page=*/100, /*row=*/100, /*column=*/50, Direction::Vertical, "ABC");
+	// notebook.write(/*page=*/100, /*row=*/100, /*column=*/54, Direction::Vertical, "xyzw");
+	// notebook.write(/*page=*/100, /*row=*/104, /*column=*/54, Direction::Vertical, "fuck");
+	cout << notebook.read(/*page=*/100, /*row=*/100, /*column=*/50, Direction::Vertical, /*length=*/4) << endl;
 	// prints "_b_" (starts at row 99 which is empty; then at row 100 there is "b"; then row 101 is empty again).
 	// notebook.write(/*page=*/100, /*row=*/70, /*column=*/52, Direction::Vertical, "xyz");
 	// throws error because writing the letter y will intersect with the letter c

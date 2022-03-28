@@ -124,7 +124,14 @@ namespace ariel
             row_of_page[i] = txt[counter];
             counter++;
         }
-        std::cout << row_of_page << "function " << std::endl;
+        pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
+        notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+    }
+
+    void create_empty_row_horizontal(int row, int column, int page, std::map<int, std::map<int, std::string>> &notebook)
+    {
+        std::map<int, std::string> pageOfbook;
+        std::string row_of_page = std::string(COL_AMOUNT, '_');
         pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
         notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
     }
@@ -154,6 +161,104 @@ namespace ariel
         pageOfbook.insert(std::pair<int, std::string>(row + counter, row_of_page));
         it->second = pageOfbook;
     }
+
+    /* read  ************************************************/
+
+    void read_horizantal_create(int length, int row, int column, int page, std::map<int, std::map<int, std::string>> &notebook, std::string &output)
+    {
+        // horizontal read
+        size_t size_of_txt = unsigned(length);
+        std::map<int, std::string> pageOfbook;
+        std::string row_of_page = std::string(COL_AMOUNT, '_');
+        size_t u_column = (size_t)column;
+        size_t counter = 0;
+        for (size_t i = u_column; i < u_column + size_of_txt; i++)
+        {
+            output += row_of_page[counter];
+            counter++;
+        }
+        pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
+        notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+    }
+
+    void read_vertical_create(int length, int row, int column, int page, std::map<int, std::map<int, std::string>> &notebook, std::string &output)
+    {
+        size_t size_of_txt = unsigned(length);
+        std::map<int, std::string> pageOfbook;
+        size_t u_column = (size_t)column;
+        for (int i = 0; i < size_of_txt; i++)
+        {
+            std::string row_of_page = std::string(COL_AMOUNT, '_');
+            output += row_of_page[u_column];
+            pageOfbook.insert(std::pair<int, std::string>(row + i, row_of_page));
+        }
+        notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+    }
+
+    void page_found_vertical_read(std::map<int, std::map<int, std::string>>::iterator &it, int row, int column, int length, std::string &output, int page, std::map<int, std::map<int, std::string>> &notebook)
+    {
+        std::map<int, std::string> pageOfbook = it->second;
+        size_t u_length = unsigned(length);
+        for (size_t i = 0; i < u_length; i++)
+        {
+            // if row doesnt exsists
+            int counter = (int)i;
+            std::map<int, std::string>::iterator it2 = pageOfbook.find(row + counter);
+            if (it2 != pageOfbook.end())
+            {
+                // row found
+                std::string row_of_page = it2->second;
+                size_t u_column = (size_t)column;
+                size_t size_of_txt = unsigned(length);
+                output += row_of_page[u_column];
+            }
+            else
+            {
+                // row not found so we create
+                size_t size_of_txt = unsigned(length);
+                std::map<int, std::string> pageOfbook;
+                size_t u_column = (size_t)column;
+                std::string row_of_page = std::string(COL_AMOUNT, '_');
+                output += row_of_page[u_column];
+                pageOfbook.insert(std::pair<int, std::string>(row + (int)i, row_of_page));
+                notebook.insert(std::pair<int, std::map<int, std::string>>(page, pageOfbook));
+            }
+        }
+    }
+
+    void page_found_horizontal_read(std::map<int, std::map<int, std::string>>::iterator &it, int row, int column, int length, std::string &output)
+    {
+        std::map<int, std::string> pageOfbook = it->second;
+        // if row exists we will use it ,
+        // else we need to make a row
+        // fix this
+        std::map<int, std::string>::iterator it2 = pageOfbook.find(row);
+        if (it2 != pageOfbook.end())
+        {
+            // row found
+            std::string row_of_page = it2->second;
+            size_t u_column = (size_t)column;
+            size_t size_of_txt = unsigned(length);
+            for (size_t i = u_column; i < u_column + size_of_txt; i++)
+            {
+                output += row_of_page[i];
+            }
+        }
+        else
+        {
+            // row not found need to create
+            std::string row_of_page = std::string(COL_AMOUNT, '_');
+            size_t size_of_txt = unsigned(length);
+            size_t u_column = (size_t)column;
+            for (size_t i = u_column; i < u_column + size_of_txt; i++)
+            {
+                output += row_of_page[i];
+            }
+            pageOfbook.insert(std::pair<int, std::string>(row, row_of_page));
+            it->second = pageOfbook;
+        }
+    }
+    /*************************************************************/
 
     void Notebook::write(int page, int row, int column, Direction dir, std::string const &txt)
     {
@@ -215,11 +320,43 @@ namespace ariel
         }
     }
 
-    // std::string read(int page, int row, int column, Direction dir, int length)
-    // {
-    //     check_negative_values_write(page, row, column);
-    //     bound_column_check(length, column);
-    // }
+    std::string Notebook::read(int page, int row, int column, Direction dir, int length)
+    {
+        check_negative_values_write(page, row, column);
+        bound_column_check(length, column);
+        std::string output;
+        std::map<int, std::map<int, std::string>>::iterator it = notebook.find(page);
+        if (it != notebook.end())
+        {
+            // page found
+            if (dir == Direction::Horizontal)
+            {
+                // horizontal
+                page_found_horizontal_read(it, row, column, length, output);
+            }
+            else
+            {
+                // vertical
+                page_found_vertical_read(it, row, column, length, output, page, notebook);
+            }
+        }
+        else
+        {
+            // page not found
+            if (dir == Direction::Horizontal)
+            {
+                // horizontal read
+                read_horizantal_create(length, row, column, page, notebook, output);
+            }
+            else
+            {
+                // vertical read
+                read_vertical_create(length, row, column, page, notebook, output);
+            }
+        }
+
+        return output;
+    }
 
     void Notebook::show(int page)
     {
