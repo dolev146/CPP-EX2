@@ -268,7 +268,15 @@ namespace ariel
     {
         check_printable_chars(txt);
         check_negative_values_write(page, row, column);
-        bound_column_check(txt, column);
+        if (column > COL_LIMIT)
+        {
+            throw std::runtime_error("nagetive values"); 
+        }
+        if (dir == Direction::Horizontal)
+        {
+            bound_column_check((int)txt.size(), column);
+        }
+
         std::map<int, std::map<int, std::string>>::iterator it = notebook.find(page);
         if (it != notebook.end())
         {
@@ -325,6 +333,10 @@ namespace ariel
     std::string Notebook::read(int page, int row, int column, Direction dir, int length)
     {
         negative_values_new_check(page, row, column, length, dir);
+        if (column > COL_LIMIT)
+        {
+            throw std::runtime_error("nagetive values");
+        }
         if (dir == Direction::Horizontal)
         {
             bound_column_check(length, column);
@@ -366,7 +378,10 @@ namespace ariel
 
     void Notebook::erase(int page, int row, int column, Direction dir, int length)
     {
-
+        if (column > COL_LIMIT)
+        {
+            throw std::runtime_error("nagetive values");
+        }
         check_negative_values_write(page, row, column);
         if (length < 0)
         {
@@ -417,7 +432,7 @@ namespace ariel
         check_page_not_negative(page);
         if (notebook.find(page) == notebook.end())
         {
-            std::cout << "empty page number " << page <<  std::endl;
+            std::cout << "empty page number " << page << std::endl;
             return;
         }
 
